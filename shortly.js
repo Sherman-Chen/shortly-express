@@ -20,11 +20,25 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(partials());
 app.use(sessions({secret: '1234'}));
+app.use(passport.initialize());
+app.use(passport.session());
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+
+var GithubStrategy = require('passport-github').Strategy;
+
+passport.use(new GithubStrategy({
+  clientID: 'cbe8c116b2484ff27419',
+  clientSecret: '6569afb5172d6c691216d54b1e8ddcd3635a1094',
+  callbackURL: 'http://localhost:30000/auth/github/callback'
+},
+  function(accessToken, refreshToken, profile, done) {
+    return done(null, profile);
+  }
+));
 
 var authenticate = function(req, res, next) {
   sess = req.session;
@@ -36,20 +50,23 @@ var authenticate = function(req, res, next) {
 };
 
 
-app.get('/', authenticate, 
+app.get('/', passport.authenticate('github'), 
 function(req, res) {
   res.render('index');
 });
 
-app.get('/create', authenticate, 
+app.get('/create', 
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links', authenticate, 
+app.get('/links', 
 function(req, res) {
   Links.reset().fetch().then(function(links) {
-    res.status(200).send(links.models);
+    var filteredLinks = links.models.filter(function(link) {
+      return link.attributes.userId === req.session.userId;
+    });
+    res.status(200).send(filteredLinks);
   });
 });
 
@@ -62,7 +79,7 @@ function(req, res) {
     return res.sendStatus(404);
   }
 
-  new Link({ url: uri }).fetch().then(function(found) {
+  new Link({ url: uri, userId: req.session.userId }).fetch().then(function(found) {
     if (found) {
       res.status(200).send(found.attributes);
     } else {
@@ -75,7 +92,8 @@ function(req, res) {
         Links.create({
           url: uri,
           title: title,
-          baseUrl: req.headers.origin
+          baseUrl: req.headers.origin,
+          userId: req.session.userId
         })
         .then(function(newLink) {
           res.status(200).send(newLink);
@@ -101,6 +119,7 @@ app.post('/login', (req, res) => {
       bcrypt.compare(request.password, found.attributes.password, function(err, response) {
         if (response) {
           sess = req.session;
+          sess.userId = found.attributes.id;
           sess.isLoggedIn = true;
           res.json({url: '/' });       
         } else {
@@ -140,8 +159,9 @@ app.post('/signup', (req, res) => {
             password: hash
           });
 
-          user.save().then(function() {
+          user.save().then(function(user) {
             sess = req.session;
+            sess.userId = user.attributes.id;
             sess.isLoggedIn = true;
             res.redirect('/');    
           });
@@ -155,7 +175,8 @@ app.post('/signup', (req, res) => {
 
 app.get('/logout', (req, res) => {
   sess = req.session;
-  sess.isLoggedIn = false;
+  sess.isLoggedIn = null;
+  sess.userId = null;
   res.end('/login'); 
 });
 /************************************************************/
@@ -165,7 +186,7 @@ app.get('/logout', (req, res) => {
 /************************************************************/
 
 app.get('/*', function(req, res) {
-  new Link({ code: req.params[0] }).fetch().then(function(link) {
+  new Link({ code: req.params[0], userId: req.session.userId }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');
     } else {
