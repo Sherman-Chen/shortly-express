@@ -55,6 +55,16 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
+var findUserId = function(req, res, next) {
+  new User({ username: req.session.username }).fetch().then(function(found) {
+    if (found) {
+      req.shortly = {};
+      req.shortly.userId = found.attributes.id;
+      next();
+    }
+  });
+};
+
 var authenticate = function(req, res, next) {
   sess = req.session;
   if (sess.isLoggedIn) {
@@ -91,17 +101,18 @@ function(req, res) {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links', findUserId,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
-    var filteredLinks = links.models.filter(function(link) {
-      return link.attributes.userId === req.session.userId;
-    });
-    res.status(200).send(filteredLinks);
+
+    // var filteredLinks = links.models.filter(function(link) {
+    //   return link.attributes.userId === req.shortly.userId;
+    // });
+    res.status(200).send(links.where({userId: req.shortly.userId}));
   });
 });
 
-app.post('/links', 
+app.post('/links', findUserId,
 function(req, res) {
   var uri = req.body.url;
 
@@ -110,7 +121,7 @@ function(req, res) {
     return res.sendStatus(404);
   }
 
-  new Link({ url: uri, userId: req.session.userId }).fetch().then(function(found) {
+  new Link({ url: uri, userId: req.shortly.userId }).fetch().then(function(found) {
     if (found) {
       res.status(200).send(found.attributes);
     } else {
@@ -124,7 +135,7 @@ function(req, res) {
           url: uri,
           title: title,
           baseUrl: req.headers.origin,
-          userId: req.session.userId
+          userId: req.shortly.userId
         })
         .then(function(newLink) {
           res.status(200).send(newLink);
@@ -150,7 +161,7 @@ app.post('/login', (req, res) => {
       bcrypt.compare(request.password, found.attributes.password, function(err, response) {
         if (response) {
           sess = req.session;
-          sess.userId = found.attributes.id;
+          sess.username = found.attributes.username;
           sess.isLoggedIn = true;
           res.json({url: '/' });       
         } else {
@@ -192,7 +203,7 @@ app.post('/signup', (req, res) => {
 
           user.save().then(function(user) {
             sess = req.session;
-            sess.userId = user.attributes.id;
+            sess.username = user.attributes.username;
             sess.isLoggedIn = true;
             res.redirect('/');    
           });
@@ -207,7 +218,7 @@ app.post('/signup', (req, res) => {
 app.get('/logout', (req, res) => {
   sess = req.session;
   sess.isLoggedIn = null;
-  sess.userId = null;
+  sess.username = null;
   //req.logout();
   //res.redirect('/');
   res.end('/login'); 
@@ -218,8 +229,8 @@ app.get('/logout', (req, res) => {
 // If the short-code doesn't exist, send the user to '/'
 /************************************************************/
 
-app.get('/*', function(req, res) {
-  new Link({ code: req.params[0], userId: req.session.userId }).fetch().then(function(link) {
+app.get('/*', findUserId, function(req, res) {
+  new Link({ code: req.params[0], userId: req.shortly.userId }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');
     } else {
