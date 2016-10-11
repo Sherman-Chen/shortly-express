@@ -97,15 +97,19 @@ app.post('/login', (req, res) => {
   var request = req.body;
 
   new User({ username: request.username }).fetch().then(function(found) {
-    bcrypt.compare(request.password, found.attributes.password, function(err, response) {
-      if (response) {
-        sess = req.session;
-        sess.isLoggedIn = true;
-        res.redirect('/');       
-      } else {
-        res.redirect('/login');
-      }
-    });
+    if (found) {
+      bcrypt.compare(request.password, found.attributes.password, function(err, response) {
+        if (response) {
+          sess = req.session;
+          sess.isLoggedIn = true;
+          res.json({url: '/' });       
+        } else {
+          res.json({err: 1});
+        }
+      });
+    } else {
+      res.json({err: 1});
+    }
   });
 /* 
 bcrypt.compare("bacon", hash, function(err, res) {

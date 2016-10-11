@@ -1,17 +1,61 @@
-<h2>Login</h2>
-<form action="/login" method="post">
-    <div>
-      <label for="username">Username:</label>
-      <input id="username" type="text" name="username">
-    </div>
-    <div>
-      <label for="password">Password:</label>
-      <input id="password" type="password" name="password">
-    </div>
-    <div>
-      <input type="submit" value="Login">
-    </div>
-</form>
-<p>
-  <a href="/signup">Create an Account &rarr;</a>
-<p>
+<div class="container">
+  <h2>Login</h2>
+  <form action="/login" method="post">
+      <div>
+        <label for="username">Username:</label>
+        <input id="username" type="text" name="username">
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input id="password" type="password" name="password">
+      </div>
+      <div class='error-wrapper'>
+        <div class='error-box' style='display: none;'></div>
+      </div>
+      <div>
+        <input type="submit" value="Login">
+      </div>
+  </form>
+  <p>
+    <a href="/signup">Create an Account &rarr;</a>
+  <p>
+</div>
+
+<script>
+var canError = true;
+
+$("form").submit(function(e){
+  var $username = $('#username').val();
+  var $password = $('#password').val();
+    $.ajax({
+      url: '/login',
+      method: 'POST',
+      data: {username: $username, password: $password},
+      success: function(data) {
+        if (data.url) {
+          window.location.href = data.url
+        }
+
+        if (data.err === 1) {
+          showError('There was an error logging in, please check your credentials');
+        }
+      },
+      error: function(err) {
+        console.log(err);
+      }
+    })
+    e.preventDefault();
+});
+
+var showError = function(message) {
+  var $errorbox = $('.error-box');
+  $errorbox.text(message);
+  if (canError) {
+    canError = false;
+    $errorbox.fadeIn(500).delay(3000).fadeOut(500, function() {
+      canError = true;
+    });
+  }
+};
+
+</script>

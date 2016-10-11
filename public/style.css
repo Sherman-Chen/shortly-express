@@ -1,7 +1,16 @@
 body {
-  margin: 0;
-  margin-top: 10px;
   font-family: arial, sans-serif;
+  margin: 0 auto;
+  width: 50%;
+  background: rebeccapurple;
+}
+
+.container {
+  border: 3px solid black;
+  border-radius: 15px;
+  padding: 15px;
+  text-align: center;
+  background-color: #FFF;
 }
 
 a {
@@ -11,6 +20,7 @@ a {
 }
 
 h1 {
+  color: ghostwhite;
   font-style: italic;
   margin-bottom: 10px;
 }
@@ -102,8 +112,8 @@ form {
 }
 
 form input[type=text], form input[type=password] {
-  width: 360px;
-  display: block;
+/*  width: 360px;
+  display: block;*/
   font-size: 13px;
   padding: 5px;
   margin-bottom: 5px;
@@ -138,4 +148,21 @@ form input[type=text], form input[type=password] {
 
 li.logout-container {
   float: right;
+}
+
+.logout-btn {
+  padding: 10px;
+  width: 100px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.error-box {
+  color: red;
+  font-size: 12px;
+}
+
+.error-wrapper {
+  height: 20px;
 }
