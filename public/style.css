@@ -1,12 +1,12 @@
 body {
   font-family: arial, sans-serif;
-  margin: 0 auto;
-  width: 50%;
-  background: rebeccapurple;
+  /*margin: 0 auto;*/
+  /*width: 50%;*/
+  background: deepskyblue;
 }
 
 .container {
-  border: 3px solid black;
+  border: 3px double lightblue;
   border-radius: 15px;
   padding: 15px;
   text-align: center;
@@ -47,7 +47,7 @@ h1 {
 
 .navigation li a , .logout {
   width: 100px;
-  height: 20px;
+/*  height: 20px;*/
   line-height: 20px;
   padding: 10px;
   display: block;
@@ -126,9 +126,6 @@ form input[type=text], form input[type=password] {
   margin: 0 10px;
 }
 
-.creator {
-  height: 50px;
-}
 
 .creator form {
   float: left;

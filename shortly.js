@@ -33,12 +33,27 @@ var GithubStrategy = require('passport-github').Strategy;
 passport.use(new GithubStrategy({
   clientID: 'cbe8c116b2484ff27419',
   clientSecret: '6569afb5172d6c691216d54b1e8ddcd3635a1094',
-  callbackURL: 'http://localhost:30000/auth/github/callback'
+  callbackURL: 'http://localhost:4568/auth/github/callback'
 },
   function(accessToken, refreshToken, profile, done) {
     return done(null, profile);
   }
 ));
+
+passport.serializeUser(function(user, done) {
+  // placeholder for custom user serialization
+  // null is for errors
+  console.log(user);
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  // placeholder for custom user deserialization.
+  // maybe you are going to get the user from mongo by id?
+  // null is for errors
+  console.log(user);
+  done(null, user);
+});
 
 var authenticate = function(req, res, next) {
   sess = req.session;
@@ -47,10 +62,26 @@ var authenticate = function(req, res, next) {
   } else {
     res.redirect('/login');
   }
+  // if (req.isAuthenticated()) {
+  //   // req.user is available for use here
+  //   next(); 
+  // } else {
+  //   res.redirect('/login');
+  // }
+
+  // denied. redirect to login
+  
 };
 
+app.get('/auth/github', passport.authenticate('github'));
 
-app.get('/', passport.authenticate('github'), 
+app.get('/auth/github/callback', passport.authenticate('github', { failureRedirect: '/' }),
+  function(req, res) {
+    res.redirect('/');
+  }
+);
+
+app.get('/', authenticate, 
 function(req, res) {
   res.render('index');
 });
@@ -177,6 +208,8 @@ app.get('/logout', (req, res) => {
   sess = req.session;
   sess.isLoggedIn = null;
   sess.userId = null;
+  //req.logout();
+  //res.redirect('/');
   res.end('/login'); 
 });
 /************************************************************/
