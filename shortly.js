@@ -4,6 +4,7 @@ var partials = require('express-partials');
 var sessions = require('express-session');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
+var passport = require('passport');
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
