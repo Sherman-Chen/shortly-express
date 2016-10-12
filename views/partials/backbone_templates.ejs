@@ -4,14 +4,14 @@
   <ul>
     <li><a href='#' class='index'>All Links</a></li>
     <li><a href='#' class='create'>Shorten</a></li>
-    <li class='logout-container'><button class='logout-btn'>Logout</button></li>
+    <li class='logout-container'><button class='logout-btn btn waves-effect waves-light'>Logout</button></li>
   </ul>
   </div>
   <div id='container' class="card white z-depth-5"></div>
 </script>
 
 <script id='link' type='text/x-handlebars-template'>
-  <img src='/redirect_icon.png'/>
+  <img src='https://www.google.com/s2/favicons?domain={{url}}'/>
   <div class='info'>
     <div class='visits'><span class='count'>{{visits}}</span>Visits</div>
     <div class='title'>{{title}}</div>
@@ -23,7 +23,7 @@
 <script id='create' type='text/x-handlebars-template'>
   <form>
       <input class='text' type='text' name='url'>
-      <input type='submit' value='Shorten'>
+      <input class="create-btn btn waves-effect waves-light" type='submit' value='Shorten'>
   </form>
   <img class='spinner' src='/spiffygif_46x46.gif'>
   <div class='message'></div>

@@ -1,5 +1,5 @@
 body {
-  font-family: arial, sans-serif;
+  font-family: 'Gloria Hallelujah', arial;
   /*margin: 0 auto;*/
   /*width: 50%;*/
   background: deepskyblue;
@@ -24,6 +24,10 @@ h1 {
   font-style: italic;
   margin-bottom: 10px;
   font-family: 'Gloria Hallelujah', cursive;
+}
+
+h2 {
+  text-align: center;
 }
 
 .navigation {
@@ -81,7 +85,8 @@ h1 {
 
 .link img {
   float: left;
-  margin: 0 5px;
+  margin: 19px 16px;
+  width: 30px;
 }
 
 .link .visits {
@@ -130,7 +135,6 @@ form input[type=text], form input[type=password] {
 
 .creator form {
   float: left;
-  height: 80px;
 }
 
 .creator img.spinner {
@@ -149,11 +153,8 @@ li.logout-container {
 }
 
 .logout-btn {
-  padding: 10px;
   width: 100px;
   height: 40px;
-  border-radius: 10px;
-  background-color: white;
 }
 
 .error-box {

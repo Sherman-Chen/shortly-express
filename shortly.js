@@ -192,23 +192,23 @@ app.post('/signup', (req, res) => {
     if (found) {
       res.redirect('/signup');
     } else {
-      bcrypt.hash(request.password, null, null, function(err, hash) {
-        if (err) {
-          console.log(err);
-        } else {
-          var user = new User({
-            username: request.username,
-            password: hash
-          });
-
-          user.save().then(function(user) {
-            sess = req.session;
-            sess.username = user.attributes.username;
-            sess.isLoggedIn = true;
-            res.redirect('/');    
-          });
-        }
+      // bcrypt.hash(request.password, null, null, function(err, hash) {
+      //   if (err) {
+      //     console.log(err);
+      //   } else {
+      var user = new User({
+        username: request.username,
+        password: request.password
       });
+
+      user.save().then(function(user) {
+        sess = req.session;
+        sess.username = user.attributes.username;
+        sess.isLoggedIn = true;
+        res.redirect('/');    
+      });
+      //   }
+      // });
 
     }
   });
